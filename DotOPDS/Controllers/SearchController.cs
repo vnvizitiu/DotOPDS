@@ -14,7 +14,7 @@ namespace DotOPDS.Controllers
     public class SearchController : ApiController
     {
         private const string Prefix = "/opds";
-        private static FeedLink SearchLink = new FeedLink { Rel = FeedLinkRel.Search, Type = FeedLinkType.Atom, Href = Prefix + "/search?q={searchTerms}&amp;page={startPage?}" };
+        private static FeedLink SearchLink = new FeedLink { Rel = FeedLinkRel.Search, Type = FeedLinkType.Atom, Href = Prefix + "/search?q={searchTerms}" };
         private static FeedLink StartLink = new FeedLink { Rel = FeedLinkRel.Start, Type = FeedLinkType.AtomNavigation, Href = Prefix.StartsWith("/") ? Prefix : "/" };
 
         [Route("")]
@@ -56,6 +56,7 @@ namespace DotOPDS.Controllers
         [RequiredParameters]
         public Feed Search([FromUri] string q, [FromUri] int page = 1)
         {
+            if (page < 1) page = 1;
             var searcher = new LuceneSearcher();
             int total;
             var query = string.Format(@"Title:""{0}"" OR Author:""{0}"" OR Series:""{0}""", searcher.Escape(q));
@@ -79,6 +80,7 @@ namespace DotOPDS.Controllers
         [HttpGet]
         public Feed SearchByGenre(string genre, [FromUri] int page = 1)
         {
+            if (page < 1) page = 1;
             var searcher = new LuceneSearcher();
             int total;
             var books = searcher.SearchExact(out total, "Genre", genre, page);
@@ -102,6 +104,7 @@ namespace DotOPDS.Controllers
         [RequiredParameters]
         public Feed SearchByAuthor([FromUri] string author, [FromUri] int page = 1)
         {
+            if (page < 1) page = 1;
             var searcher = new LuceneSearcher();
             int total;
             var books = searcher.SearchExact(out total, "Author.Exact", author, page);
@@ -125,6 +128,7 @@ namespace DotOPDS.Controllers
         [RequiredParameters]
         public Feed SearchBySeries([FromUri] string series, [FromUri] int page = 1)
         {
+            if (page < 1) page = 1;
             var searcher = new LuceneSearcher();
             int total;
             var books = searcher.SearchExact(out total, "Series.Exact", series, page);
@@ -195,7 +199,7 @@ namespace DotOPDS.Controllers
             string result = url;
             if (url.Contains("page="))
             {
-                const string r = @"([\?&]page=)(\d+)";
+                const string r = @"([\?&]page=)(\d*)";
                 var value = page <= 1 ? "" : "${1}" + page;
                 result = Regex.Replace(url, r, value);
             }
