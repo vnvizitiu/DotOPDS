@@ -1,31 +1,31 @@
-# DotOPDS: the lightweight* OPDS server
-
-**This is a WIP project.**
+# DotOPDS: the lightweight OPDS server
 
 DotOPDS is an [OPDS][1] server designed for large libraries like
 full archive of [lib.rus.ec][2] or [Flibusta][3].
 
-_* maybe not so :wink: it consumes up to 100mb RAM on my typical usage
-with no more 10 users_
-
 ## Features
 
 * Full-text search through Lucene.net
-* Importing `.inpx` index files
+* Plugins support
 * Support for external converters
 * OPDS catalog localization
 * Basic authentication support
 * Works on Windows (.NET 4.5.2) and Linux (mono 4.2.3) *(not tested on OS X)*
 * Cover and annotation extraction *(experimental)*
-* Web interface support (not included)
+* Web interface support (not included, see example [here][6])
 
-## Limitations
+## Included plugins
 
-* Works only with archived `fb2` libraries for now
+* `BookProvider.Inpx` - import `.inpx` files
+* `FileFormat.Fb2` - extracts annotation and cover from fb2 books
+
+## Third-party plugins
+
+* [Pdf tree import](https://github.com/GerritV/DotOPDS) - import `.pdf` files with genres tree from filesystem
 
 ## Getting started
 
-Download [latest build][4] from CI server, extract somewhere.
+Download [latest release][4] and extract somewhere.
 Now create default configuration file:
 
     DotOPDS init -c path/to/config
@@ -52,11 +52,10 @@ Now edit configuration file if needed:
     },
     "authentication": {
         "enabled": false, // enable basic authentication
-        "attempts": 3, // how many wrong auth attempts before ban
+        "attempts": 3, // how many wrong auth attempts before ban. Banned ips stored in banned.json near config file
         "users": {
             "user": "pass"
-        },
-        "banned": [] // banned ips will be here
+        }
     },
     "pagination": 10, // how many books per page
     "converters": [
@@ -70,9 +69,14 @@ Now edit configuration file if needed:
 }
 ```
 
-Import library index:
+Import library index from `.inpx` file:
 
-    DotOPDS import D:\library D:\lib.inpx
+    DotOPDS import inpx D:\library D:\lib.inpx
+
+To see available import plugins type:
+
+    DotOPDS import help
+    DotOPDS import help inpx # plugin help
 
 Now just start server:
 
@@ -88,16 +92,21 @@ Use [NSSM][5], Luke!
 
 ## TODO
 
-* producing `.inpx` diff for index updates
 * support for more file formats (epub)
-* support for not archived libraries
 
 ## License
 
 [MIT](LICENSE)
 
+## Preparing release
+ * Bump version in `appveyor.yml`
+ * Make tag with version number
+ * Wait for ci build completed and edit draft description
+ * Publish
+
 [1]: https://en.wikipedia.org/wiki/OPDS
 [2]: http://lib.rus.ec
 [3]: http://flibusta.is
-[4]: https://ci.appveyor.com/api/projects/nis/dotopds/artifacts/DotOPDS.zip
+[4]: https://github.com/DeniSix/DotOPDS/releases
 [5]: https://nssm.cc
+[6]: https://github.com/DeniSix/DotOPDS-web
